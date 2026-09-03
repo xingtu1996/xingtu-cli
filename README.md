@@ -2,7 +2,10 @@
 
 > 纯 Shell / Python 标准库实现，零第三方依赖，即拉即用。
 
-![MIT](https://img.shields.io/badge/license-MIT-green.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Scripts](https://img.shields.io/badge/scripts-5-blue.svg)
+![Dependency](https://img.shields.io/badge/dependency-zero-brightgreen.svg)
+![Shell](https://img.shields.io/badge/shell-bash%20%7C%20python-lightgrey.svg)
 
 ## 这是什么
 
