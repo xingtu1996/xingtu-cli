@@ -50,3 +50,16 @@ scripts/   ***REMOVED*** CLI 工具（Python 标准库 / bash，零第三方依�
 ***REMOVED******REMOVED*** 许可证
 
 MIT License
+
+---
+
+***REMOVED******REMOVED*** 📡 关于作者 · 行途
+
+我是**行途（行途 XingTu）**，一线技术经理 + 仍在写代码。
+
+- 🔔 公众号 **「行途技术手记」**：微信搜索关注，看 AI 工程化落地实战
+- 💬 微信：**xingtu_note**（备注"开源"优先通过）
+- 🌐 博客 / 作品集：https://xingtu1996.github.io
+
+如果这份仓库对你有帮助，欢迎在公众号留言交流 🙌
+
