@@ -1,5 +1,5 @@
-***REMOVED***!/usr/bin/env python3
-***REMOVED*** -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 cc-switch-sync-profiles.py  v2
 基于当前真实 ~/.claude/settings.json（保留全部 hooks / statusLine / theme），
@@ -20,8 +20,8 @@ cc-switch-sync-profiles.py  v2
     以环境变量 TOKENHUB_API_KEY 传入。
 
 用法：
-  python3 cc-switch-sync-profiles.py            ***REMOVED*** dry-run 预览
-  python3 cc-switch-sync-profiles.py --really   ***REMOVED*** 写入（先自动备份 db）
+  python3 cc-switch-sync-profiles.py            # dry-run 预览
+  python3 cc-switch-sync-profiles.py --really   # 写入（先自动备份 db）
 """
 import os, sys, json, sqlite3, shutil, time, argparse
 
@@ -29,10 +29,10 @@ DB = os.path.expanduser("~/.cc-switch/cc-switch.db")
 SETTINGS = os.path.expanduser("~/.claude/settings.json")
 BACKUP_DIR = os.path.expanduser("~/.cc-switch/backups")
 GATEWAY = "http://localhost:4000"
-***REMOVED*** 固定长占位 auth：sk- 前缀 + 46 hex，约 49 字符，过 CC 登录格式检查；网关不校验它。
+# 固定长占位 auth：sk- 前缀 + 46 hex，约 49 字符，过 CC 登录格式检查；网关不校验它。
 AUTH_PLACEHOLDER = "sk-REPLACE_WITH_REAL_KEY_via_env_0000000000000000000000"
 
-***REMOVED*** 25 款模型（与 tokenhub_minigate.py 对齐）
+# 25 款模型（与 tokenhub_minigate.py 对齐）
 MODELS = [
     "hy3", "kimi-k3", "kimi-k2.7-code", "kimi-k2.7-code-highspeed", "minimax-m3", "minimax-m2.7",
     "deepseek-v4-pro", "deepseek-v4-flash", "deepseek-v4-pro-202606", "deepseek-v4-flash-202605",
@@ -64,23 +64,23 @@ def build_env(base_env, main_model):
             env[k] = v
     mm = main_model + "[1m]"
     env["ANTHROPIC_BASE_URL"] = GATEWAY
-    env["ANTHROPIC_AUTH_TOKEN"] = AUTH_PLACEHOLDER  ***REMOVED*** 占位，网关不校验；真鉴权走 TOKENHUB_API_KEY
+    env["ANTHROPIC_AUTH_TOKEN"] = AUTH_PLACEHOLDER  # 占位，网关不校验；真鉴权走 TOKENHUB_API_KEY
     env["ANTHROPIC_API_KEY"] = ""
     env["ANTHROPIC_MODEL"] = mm
     for role in ("SONNET", "OPUS", "HAIKU", "FABLE"):
         env[f"ANTHROPIC_DEFAULT_{role}_MODEL"] = mm
     env["ANTHROPIC_REASONING_MODEL"] = mm
     env["ANTHROPIC_SUBAGENT_MODEL"] = mm
-    ***REMOVED*** 正解：让 CC 跳过对非 Anthropic 模型名的校验（Ollama 本地模型同机制）
+    # 正解：让 CC 跳过对非 Anthropic 模型名的校验（Ollama 本地模型同机制）
     env["ANTHROPIC_CUSTOM_MODEL_OPTION"] = mm
     return env
 
 
 def build_settings(base, main_model):
-    cfg = json.loads(json.dumps(base))  ***REMOVED*** deepcopy
+    cfg = json.loads(json.dumps(base))  # deepcopy
     cfg["env"] = build_env(base.get("env", {}), main_model)
     cfg["model"] = main_model + "[1m]"
-    cfg.pop("modelOverrides", None)  ***REMOVED*** 当前版本 modelOverrides 对未知模型无效，移除避免混淆
+    cfg.pop("modelOverrides", None)  # 当前版本 modelOverrides 对未知模型无效，移除避免混淆
     return cfg
 
 
@@ -92,7 +92,7 @@ def build_env_all25(base_env):
             env[k] = v
     default = "deepseek-v4-flash[1M]"
     env["ANTHROPIC_BASE_URL"] = GATEWAY
-    env["ANTHROPIC_AUTH_TOKEN"] = AUTH_PLACEHOLDER  ***REMOVED*** 占位，网关不校验；真鉴权走 TOKENHUB_API_KEY
+    env["ANTHROPIC_AUTH_TOKEN"] = AUTH_PLACEHOLDER  # 占位，网关不校验；真鉴权走 TOKENHUB_API_KEY
     env["ANTHROPIC_API_KEY"] = ""
     env["ANTHROPIC_MODEL"] = default
     for role in ("SONNET", "OPUS", "HAIKU", "FABLE"):
@@ -100,15 +100,15 @@ def build_env_all25(base_env):
         env[f"ANTHROPIC_DEFAULT_{role}_MODEL_NAME"] = default
     env["ANTHROPIC_REASONING_MODEL"] = default
     env["ANTHROPIC_SUBAGENT_MODEL"] = default
-    ***REMOVED*** 正解：多行 CUSTOM_MODEL_OPTION 把全部 25 款都声明为合法自定义模型
+    # 正解：多行 CUSTOM_MODEL_OPTION 把全部 25 款都声明为合法自定义模型
     env["ANTHROPIC_CUSTOM_MODEL_OPTION"] = "\n".join(m + "[1m]" for m in MODELS)
-    ***REMOVED*** 网关发现：让 CC 从 localhost:4000 的 /v1/models 拉出全部 25 款（与 CUSTOM 双保险）
+    # 网关发现：让 CC 从 localhost:4000 的 /v1/models 拉出全部 25 款（与 CUSTOM 双保险）
     env["CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY"] = "1"
     return env
 
 
 def build_settings_all25(base):
-    cfg = json.loads(json.dumps(base))  ***REMOVED*** deepcopy
+    cfg = json.loads(json.dumps(base))  # deepcopy
     cfg["env"] = build_env_all25(base.get("env", {}))
     cfg["model"] = "deepseek-v4-flash[1M]"
     cfg.pop("modelOverrides", None)
@@ -129,7 +129,7 @@ def main():
         base = json.load(f)
     has_hooks = "hooks" in base
 
-    ***REMOVED*** 档位：1 个网关默认档 + 25 个单模型档 + 1 个「网关全25款」聚合档
+    # 档位：1 个网关默认档 + 25 个单模型档 + 1 个「网关全25款」聚合档
     profiles = [("tokenhub-gateway", "TokenHub·网关默认(DeepSeek)", "deepseek-v4-flash")]
     for m in MODELS:
         profiles.append((f"tokenhub-{m}", f"TokenHub·{DISPLAY.get(m, m)}", m))
@@ -141,7 +141,7 @@ def main():
         env = cfg["env"]
         built.append((pid, name, main, cfg))
         print(f"  {name:28} | base={env['ANTHROPIC_BASE_URL']} | model={env['ANTHROPIC_MODEL']} | auth=占位 | custom={env['ANTHROPIC_CUSTOM_MODEL_OPTION']}")
-    ***REMOVED*** 聚合档：一个网关档覆盖全部 25 款（/model 可切换）
+    # 聚合档：一个网关档覆盖全部 25 款（/model 可切换）
     all25_cfg = build_settings_all25(base)
     built.append(("tokenhub-gateway-all25", "TokenHub·网关全25款", "deepseek-v4-flash", all25_cfg))
     a25 = all25_cfg["env"]["ANTHROPIC_CUSTOM_MODEL_OPTION"]
@@ -159,7 +159,7 @@ def main():
     shutil.copy2(DB, bak)
     print(f"\n✅ db 已备份: {bak}")
 
-    ***REMOVED*** 清理旧的 tokenhub-* 档，避免残留
+    # 清理旧的 tokenhub-* 档，避免残留
     cur.execute("DELETE FROM providers WHERE id LIKE 'tokenhub-%'")
     deleted = cur.rowcount
     print(f"🧹 清除旧 tokenhub 档: {deleted} 条")

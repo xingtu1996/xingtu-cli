@@ -1,28 +1,28 @@
-***REMOVED***!/bin/bash
-***REMOVED*** safe-delete.sh — 安全删除：mv 到工作区本地回收站，永不 rm 用户文件
-***REMOVED*** 用法:
-***REMOVED***   safe-delete.sh <path> [path2 ...]      把文件/目录移入回收站
-***REMOVED***   safe-delete.sh --list                  列出回收站条目及原路径
-***REMOVED***   safe-delete.sh --restore <trash-name>  恢复到原位
-***REMOVED***   safe-delete.sh --clean [days]          清理 N 天前的回收站条目（仅限回收站内部）
-***REMOVED***
-***REMOVED*** 回收站默认位于 <xingtu>/.trash（脚本自动定位工作区根），可用环境变量
-***REMOVED*** SAFE_DELETE_TRASH 覆盖。
-***REMOVED***
-***REMOVED*** ⛔ 设计铁律（Boss 要求）：工作区文件只进回收站，绝不 rm。
-***REMOVED***    --clean 只删除“回收站内部”已删除的条目，且做了禁区越界防护，
-***REMOVED***    任何情况下都不会触碰工作区真实文件。
+#!/bin/bash
+# safe-delete.sh — 安全删除：mv 到工作区本地回收站，永不 rm 用户文件
+# 用法:
+#   safe-delete.sh <path> [path2 ...]      把文件/目录移入回收站
+#   safe-delete.sh --list                  列出回收站条目及原路径
+#   safe-delete.sh --restore <trash-name>  恢复到原位
+#   safe-delete.sh --clean [days]          清理 N 天前的回收站条目（仅限回收站内部）
+#
+# 回收站默认位于 <xingtu>/.trash（脚本自动定位工作区根），可用环境变量
+# SAFE_DELETE_TRASH 覆盖。
+#
+# ⛔ 设计铁律（Boss 要求）：工作区文件只进回收站，绝不 rm。
+#    --clean 只删除“回收站内部”已删除的条目，且做了禁区越界防护，
+#    任何情况下都不会触碰工作区真实文件。
 
 set -euo pipefail
 
-***REMOVED*** 定位工作区根（脚本位于 <root>/tools/safety/ 下）
+# 定位工作区根（脚本位于 <root>/tools/safety/ 下）
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 XINGTU_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 TRASH_DIR="${SAFE_DELETE_TRASH:-${XINGTU_ROOT}/.trash}"
 LOG_FILE="${TRASH_DIR}/trash.log"
 mkdir -p "${TRASH_DIR}"
 
-***REMOVED*** 越界防护：TRASH_DIR 不得落在系统根 / 家目录等禁区
+# 越界防护：TRASH_DIR 不得落在系统根 / 家目录等禁区
 guard_trash_dir() {
   case "${TRASH_DIR}" in
     /|/Users|/Home|/home|"${HOME}"|"${HOME}/"*)
@@ -53,10 +53,10 @@ if [[ "${1:-}" == "--clean" ]]; then
   DAYS="${2:-30}"
   echo "清理 ${DAYS} 天前的回收站条目（仅限回收站内部，绝不触碰工作区）..."
   find "${TRASH_DIR}" -maxdepth 1 -mindepth 1 ! -name 'trash.log' ! -name '.origin_*' -mtime "+${DAYS}" -exec rm -rf {} \; 2>/dev/null || true
-  ***REMOVED*** 同步清理孤儿 .origin 副作用文件
+  # 同步清理孤儿 .origin 副作用文件
   for o in "${TRASH_DIR}"/.origin_*; do
     [[ -e "${o}" ]] || continue
-    base="${o***REMOVED***${TRASH_DIR}/.origin_}"
+    base="${o#${TRASH_DIR}/.origin_}"
     [[ -e "${TRASH_DIR}/${base}" ]] || rm -f "${o}" 2>/dev/null || true
   done
   log_entry "CLEAN: 清理了 ${DAYS} 天前的回收站条目"
@@ -79,7 +79,7 @@ if [[ "${1:-}" == "--restore" ]]; then
   exit 0
 fi
 
-if [[ $***REMOVED*** -eq 0 ]]; then
+if [[ $# -eq 0 ]]; then
   echo "用法: safe-delete.sh [--list|--restore <name>|--clean [days]| <path>...]"
   exit 1
 fi

@@ -1,4 +1,4 @@
-***REMOVED*** XingTu CLI · 零依赖开发者命令行工具
+# XingTu CLI · 零依赖开发者命令行工具
 
 > 纯 Shell / Python 标准库实现，零第三方依赖，即拉即用。
 
@@ -7,11 +7,11 @@
 ![Dependency](https://img.shields.io/badge/dependency-zero-brightgreen.svg)
 ![Shell](https://img.shields.io/badge/shell-bash%20%7C%20python-lightgrey.svg)
 
-***REMOVED******REMOVED*** 这是什么
+## 这是什么
 
 `xingtu-cli` 是行途开源矩阵的 **CLI 工具资产仓**。收录零依赖、可独立执行的命令行工具：Claude Code 多 provider 配置管理、文件操作安全护栏、环境自检。
 
-***REMOVED******REMOVED*** 工具清单
+## 工具清单
 
 | 工具 | 说明 |
 |------|------|
@@ -21,39 +21,39 @@
 | scripts/safe-delete.sh | 安全删除：进回收站/确认，避免误删 |
 | scripts/env-check.sh | 开发环境自检（依赖/版本/路径）|
 
-***REMOVED******REMOVED*** 用法
+## 用法
 
 ```bash
-***REMOVED*** 配置管理：把 TokenHub 网关加入 cc-switch（密钥走环境变量，不落盘）
+# 配置管理：把 TokenHub 网关加入 cc-switch（密钥走环境变量，不落盘）
 TOKENHUB_API_KEY=你的Key python3 scripts/cc-switch-add-tokenhub.py
 
-***REMOVED*** 安全护栏
+# 安全护栏
 bash scripts/backup-before-op.sh target/
 bash scripts/safe-delete.sh file.txt
 
-***REMOVED*** 环境自检
+# 环境自检
 bash scripts/env-check.sh
 ```
 
-***REMOVED******REMOVED*** 安全设计
+## 安全设计
 
 - 密钥/Token 一律走环境变量（`TOKENHUB_API_KEY` / `ANTHROPIC_API_KEY`），**不硬编码、不落盘**
 - 网关鉴权用占位符 + 真鉴权走网关侧 `TOKENHUB_API_KEY`
 - 危险操作（删除/覆盖）内置备份与确认
 
-***REMOVED******REMOVED*** 目录结构
+## 目录结构
 
 ```
-scripts/   ***REMOVED*** CLI 工具（Python 标准库 / bash，零第三方依赖）
+scripts/   # CLI 工具（Python 标准库 / bash，零第三方依赖）
 ```
 
-***REMOVED******REMOVED*** 许可证
+## 许可证
 
 MIT License
 
 ---
 
-***REMOVED******REMOVED*** 📡 关于作者 · 行途
+## 📡 关于作者 · 行途
 
 我是**行途**，一线技术经理 + 仍在写代码。
 

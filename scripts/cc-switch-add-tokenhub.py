@@ -1,5 +1,5 @@
-***REMOVED***!/usr/bin/env python3
-***REMOVED*** -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 把 TokenHub 供应商一键写入 cc-switch 数据库（Lingrui98/cc-switch 桌面版）。
 
@@ -15,8 +15,8 @@
   - 默认 dry-run（只打印不写），加 --really 才真正写入。
 
 用法：
-  python3 cc-switch-add-tokenhub.py            ***REMOVED*** 预览将要写入的内容
-  python3 cc-switch-add-tokenhub.py --really   ***REMOVED*** 真正写入数据库
+  python3 cc-switch-add-tokenhub.py            # 预览将要写入的内容
+  python3 cc-switch-add-tokenhub.py --really   # 真正写入数据库
 
 前置：
   1) 先起本地网关（否则切过去 Claude Code 连不上）：
@@ -41,7 +41,7 @@ def build_env(profile, gateway):
     env = {
         "ANTHROPIC_BASE_URL": gateway["base_url"],
         "ANTHROPIC_AUTH_TOKEN": gateway["auth_token_placeholder"],
-        "ANTHROPIC_API_KEY": "",  ***REMOVED*** 必须清空，防止 Claude Code 回退到 Anthropic 官方
+        "ANTHROPIC_API_KEY": "",  # 必须清空，防止 Claude Code 回退到 Anthropic 官方
         "ANTHROPIC_MODEL": profile["default_model"],
         "ANTHROPIC_DEFAULT_SONNET_MODEL": slots["sonnet"],
         "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": slots["sonnet"],
@@ -77,12 +77,12 @@ def main():
 
     with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
         settings = json.load(f)
-    ***REMOVED*** 复制当前 settings 的非 env 顶层配置（hooks/statusLine/permissions 等），切过去不丢
+    # 复制当前 settings 的非 env 顶层配置（hooks/statusLine/permissions 等），切过去不丢
     base_config = {k: v for k, v in settings.items() if k != "env"}
 
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-    ***REMOVED*** 当前最大 sort_index，新插入往后排
+    # 当前最大 sort_index，新插入往后排
     max_sort = cur.execute("SELECT MAX(sort_index) FROM providers").fetchone()[0]
     max_sort = max_sort or 0
 
@@ -111,7 +111,7 @@ def main():
         con.close()
         return
 
-    ***REMOVED*** 真正写入：先备份
+    # 真正写入：先备份
     backup_dir = os.path.join(HOME, ".cc-switch", "backups")
     os.makedirs(backup_dir, exist_ok=True)
     backup_path = os.path.join(backup_dir, f"cc-switch.db.bak-{int(time.time())}")

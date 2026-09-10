@@ -1,11 +1,11 @@
-***REMOVED***!/usr/bin/env bash
-***REMOVED*** env-check.sh — 行途工作区环境自检（轻量，内容工作空间适用）
-***REMOVED*** 用途: 进入工作区前一键确认 工具链 + 结构完整性 + 安全机制 是否就位
-***REMOVED*** 使用: bash env-check.sh [--verbose]
-***REMOVED***
-***REMOVED*** 区别于 CC 侧 env-check.sh（面向 VDI/Copilot/Java/.NET 开发环境），
-***REMOVED*** 本版针对 xingtu 内容工作空间：检查磁盘、python/node/git、锚点文件、
-***REMOVED*** 六层目录、以及安全脚本是否就位。
+#!/usr/bin/env bash
+# env-check.sh — 行途工作区环境自检（轻量，内容工作空间适用）
+# 用途: 进入工作区前一键确认 工具链 + 结构完整性 + 安全机制 是否就位
+# 使用: bash env-check.sh [--verbose]
+#
+# 区别于 CC 侧 env-check.sh（面向 VDI/Copilot/Java/.NET 开发环境），
+# 本版针对 xingtu 内容工作空间：检查磁盘、python/node/git、锚点文件、
+# 六层目录、以及安全脚本是否就位。
 
 set -uo pipefail
 
@@ -26,7 +26,7 @@ echo "  行途工作区环境自检  $(date '+%Y-%m-%d %H:%M:%S')"
 echo "  根: ${XINGTU_ROOT}"
 echo "=========================================="
 
-***REMOVED*** 1. 磁盘剩余
+# 1. 磁盘剩余
 FREE_G=$(df -g "${XINGTU_ROOT}" 2>/dev/null | awk 'NR==2{print $4}')
 if [[ ${FREE_G:-0} -lt 5 ]]; then
   warn "磁盘剩余 ${FREE_G}G（<5G，注意清理，当前机器已 ~93% 占用）"
@@ -34,7 +34,7 @@ else
   ok "磁盘剩余 ${FREE_G}G"
 fi
 
-***REMOVED*** 2. 工具链
+# 2. 工具链
 for c in python3 node git; do
   if command -v "$c" &>/dev/null; then
     ok "$c 可用: $($c --version 2>&1 | head -1)"
@@ -43,19 +43,19 @@ for c in python3 node git; do
   fi
 done
 
-***REMOVED*** 3. 锚点文件（给 AI 进空间时快速定位）
+# 3. 锚点文件（给 AI 进空间时快速定位）
 for f in HARNESS.md DIRECTORY.md README.md; do
   if [[ -f "${XINGTU_ROOT}/$f" ]]; then ok "锚点文件存在: $f"; else fail "锚点文件缺失: $f"; fi
 done
 
-***REMOVED*** 4. 六层目录（harness 体系映射）
+# 4. 六层目录（harness 体系映射）
 for d in "01_战略与规章 (Strategy & Rules)" "02_内容仓库 (Content Hub)" \
          "03_运营工具箱 (Operations Toolkit)" "04_会话与复盘 (Archive & Review)" \
          "06_个人知识库_Obsidian" rules workflows tools; do
   if [[ -d "${XINGTU_ROOT}/$d" ]]; then ok "目录存在: $d"; else warn "目录缺失: $d"; fi
 done
 
-***REMOVED*** 5. 安全机制就位
+# 5. 安全机制就位
 [[ -f "${SCRIPT_DIR}/safe-delete.sh" ]] && ok "safe-delete.sh 就位（替代 rm）" || fail "safe-delete.sh 缺失"
 [[ -f "${SCRIPT_DIR}/backup-before-op.sh" ]] && ok "backup-before-op.sh 就位（操作前备份）" || fail "backup-before-op.sh 缺失"
 
