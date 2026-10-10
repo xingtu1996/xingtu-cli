@@ -5,7 +5,7 @@
 
 原理：cc-switch 把所有供应商存在 ~/.cc-switch/cc-switch.db 的 providers 表，
 切换时把选中供应商的 settings_config 覆盖写进 ~/.claude/settings.json。
-本脚本按现有中转供应商（如 codemax）的真实字段格式，把 TokenHub 各档位插入，
+本脚本按现有中转供应商（如 内部 AI 平台）的真实字段格式，把 TokenHub 各档位插入，
 从而让 cc-switch 里出现「TokenHub·网关全25款 / Hy3 / Kimi / ...」等一键档。
 
 安全：
