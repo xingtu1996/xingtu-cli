@@ -1,0 +1,60 @@
+# fs-ops 配置示例（复制为 config.yaml，填入你项目真实值）
+# 敏感信息（密码/token）不要写死在这里——用环境变量或 ~/.fs-ops.env
+
+# ===== 环境矩阵（工具 ≠ 所有环境都能用）=====
+# 每个工具登记：作用环境 envs + URL + 认证方式 auth
+fs_ops:
+  environments:
+    # 日志：SLS（uat/prod 分 project 空间），Kibana（sit）
+    sls:
+      envs: [uat, prod]
+      space:
+        uat: "<SLS_PROJECT_UAT>"
+        prod: "<SLS_PROJECT_PROD>"
+      region: "cn-shenzhen"
+      auth: oauth        # aliyun OAuth（推荐，自动续期）
+    kibana:
+      envs: [sit]
+      url: "https://kibana-<env>.example.com"
+      index: "<env>-applog-*"
+      auth: none
+    # 数据库（只读查询，写操作走单独的写守卫命令）
+    db:
+      envs: [local, sit, uat]
+      auth: account      # 连接串放 ~/.fs-ops.env，不进 config
+    # CI：Jenkins
+    jenkins:
+      envs: [dev, sit, uat]
+      auth: api_token    # ~/.fs-ops.env JENKINS_API_TOKEN
+    # 部署状态：Rancher / ArgoCD
+    rancher:
+      envs: [sit, uat, prod]
+      auth: api_token
+    argocd:
+      envs: [dev, sit, uat]
+      auth: git
+    # 服务健康：Spring Boot Admin / Eureka（零认证）
+    health:
+      envs: [uat]
+      sba_url: "https://springbootadmin-uat.example.com"
+      eureka_url: "https://eureka-uat.example.com"
+      auth: none
+    # 演示命令（不真实调上游，仅跑通骨架）
+    demo:
+      envs: [sit, uat, prod]
+      auth: none
+
+  # 认证收口位置（token 放 ~/.fs-ops.env，这里只登记怎么读）
+  auth_scope:
+    oauth:      "aliyun CLI OAuth profile（自动续期）"
+    api_token:  "~/.fs-ops.env 对应键"
+    account:    "~/.fs-ops.env DB_USER / DB_PASS"
+    none:       "无认证（内网直连）"
+
+# ===== 数据库连接串（db 命令用，密码走 env 不进文件）=====
+# environments:
+#   sit:
+#     my-module:
+#       url: "jdbc:mysql://<host>:3306/<db>"
+#       user: "${DB_USER}"
+#       pass: "${DB_PASS}"
