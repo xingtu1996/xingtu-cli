@@ -1,0 +1,100 @@
+#!/bin/bash
+# ============================================================================
+# fs-ops — 统一运维 CLI（能力层统一入口）
+#
+# 定位: 把散落脚本工具（日志/数据库/CI/部署/健康检查）聚合为
+#       一条命令，人 + AI Agent 通用。环境矩阵统一读 config.yaml fs_ops 节。
+#
+# 用法:
+#   fs-ops <verb> <target...> [--env sit|uat|prod] [--json]
+#   例:
+#     fs-ops log order-service --env uat --since 30m
+#     fs-ops db my-module --env sit "SELECT COUNT(*) FROM orders"
+#     fs-ops health eureka --env uat
+#
+# 环境: bash 3.2+（禁 bash4 特性）｜ python3 标准库 ｜ 零额外依赖
+# 认证: 统一收口 ~/.fs-ops.env（0600）+ config.yaml fs_ops.auth_scope
+# ============================================================================
+set -u
+
+FS_OPS_DIR="$(cd "$(dirname "$0")" && pwd)"
+FS_OPS_LIB="${FS_OPS_DIR}/lib"
+FS_OPS_COMMANDS="${FS_OPS_DIR}/commands"
+# 默认配置位置：与本目录同级的 config.yaml（复制到项目 .claude/fs-ops 后即 ../config.yaml）
+FS_OPS_CONFIG="${FS_OPS_CONFIG:-${FS_OPS_DIR}/config.yaml}"
+FS_OPS_ENV_FILE="${HOME}/.fs-ops.env"
+
+# 依赖 lib
+# shellcheck disable=SC1091
+source "${FS_OPS_LIB}/common.sh"
+
+# --- 帮助 --------------------------------------------------------------
+show_help() {
+  cat <<'EOF'
+fs-ops — 统一运维 CLI
+
+用法:
+  fs-ops <verb> [target...] [--env <sit|uat|prod>] [--json]
+  fs-ops help | --help | -h       显示帮助
+  fs-ops list                     列出可用命令
+  fs-ops auth status              查看认证状态
+
+命令:
+  demo  演示命令（从 _TEMPLATE.sh 复制改造，展示 AI 友好写法）
+  log   查日志（示例：SLS uat/prod 分空间；Kibana sit）
+  db    查数据库（示例：只读，写守卫）
+  ci    构建（示例：Jenkins）
+  ops   部署状态（示例：K8s 视角）
+  health 服务健康 + 注册中心
+
+通用参数:
+  --env <env>   环境（必填，防误用；prod 写操作需确认）
+  --json        结构化 JSON 输出（Agent 友好）
+  --help        命令级帮助
+
+环境:
+  认证统一收口 ~/.fs-ops.env（0600）＋ config.yaml fs_ops.auth_scope
+EOF
+}
+
+# --- 命令列表 ----------------------------------------------------------
+list_commands() {
+  local cmd desc
+  if [ ! -d "${FS_OPS_COMMANDS}" ]; then
+    fs_err 4 "commands 目录不存在: ${FS_OPS_COMMANDS}"
+  fi
+  echo "可用命令:"
+  for f in "${FS_OPS_COMMANDS}"/*.sh; do
+    [ -f "$f" ] || continue
+    cmd="$(basename "$f" .sh)"
+    [ "$cmd" = "_TEMPLATE" ] && continue   # 模板不显示
+    # 描述取头部注释中首个含 "—" 的说明行（模板规范: "# <命令> — <说明>"）
+    desc="$(grep -m1 '—' "$f" 2>/dev/null | sed 's/^# *//')"
+    printf '  %-8s %s\n' "$cmd" "$desc"
+  done
+}
+
+# --- 主入口 ------------------------------------------------------------
+main() {
+  [ $# -eq 0 ] && { show_help; exit 0; }
+  local verb="$1"; shift
+
+  case "$verb" in
+    help|--help|-h) show_help; exit 0 ;;
+    list) list_commands; exit 0 ;;
+    auth) source "${FS_OPS_LIB}/auth.sh"; fs_auth_main "$@"; exit $? ;;
+  esac
+
+  local script="${FS_OPS_COMMANDS}/${verb}.sh"
+  if [ ! -f "$script" ]; then
+    # 先解析通用参数，使 --json 生效
+    parse_common_args "$@"
+    fs_err $FS_ERR_USAGE "未知命令: ${verb}（可用 fs-ops list 查看）"
+  fi
+
+  # shellcheck disable=SC1090
+  source "$script"
+  run "$@"
+}
+
+main "$@"
