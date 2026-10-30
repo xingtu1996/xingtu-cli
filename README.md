@@ -79,9 +79,10 @@ MIT License
 
 ---
 
-## 关于作者 · 行途技术
+## 关于作者 · 行途 XingTu
 
-- 公众号「行途技术」（长文首发，微信搜索关注）
+- 公众号「行途技术手记」（长文首发，微信搜索关注）
 - GitHub：[@xingtu1996](https://github.com/xingtu1996)
 - 方法论旗舰仓：[xingtu-ai-engineering](https://github.com/xingtu1996/xingtu-ai-engineering)
+- 工具集聚合镜像：[xingtu-tools](https://github.com/xingtu1996/xingtu-tools)（本仓 CLI 的镜像收录，权威源在本仓）
 - 开源矩阵：[xingtu1996](https://github.com/xingtu1996) — AI 工程化 / Agent Harness / 省 Token 实践
