@@ -28,7 +28,7 @@ __pycache__/
 logs/
 
 # Backup
-*.bak
+*.bak*
 *.backup
 .backups/
 .trash/
